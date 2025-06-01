@@ -3,10 +3,95 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ExternalLink, Github, Star, GitFork, RefreshCw } from "lucide-react"
+import { ExternalLink, Github, Star, GitFork, RefreshCw, Eye } from "lucide-react"
 import { getGitHubProjects, techColors, type Project } from "../utils/github"
 
-
+// Function to get image from GitHub repository
+const getProjectImage = async (githubUrl: string, repoName: string): Promise<string | null> => {
+  try {
+    // Extract username and repo name from GitHub URL
+    const urlParts = githubUrl.split('/')
+    const username = urlParts[urlParts.length - 2]
+    const repo = urlParts[urlParts.length - 1]
+    
+    // Common image extensions to check
+    const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']
+    const commonImageNames = ['screenshot', 'preview', 'demo', 'cover', 'banner', repoName.toLowerCase()]
+    
+    // GitHub API endpoint for repository contents
+    const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/images/`
+    
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        ...(process.env.NEXT_PUBLIC_GITHUB_TOKEN && {
+          'Authorization': `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`
+        })
+      }
+    })
+    
+    if (!response.ok) {
+      // If images folder doesn't exist, try root directory
+      const rootResponse = await fetch(`https://api.github.com/repos/${username}/${repo}/contents`, {
+        headers: {
+          'Accept': 'application/vnd.github.v3+json',
+          ...(process.env.NEXT_PUBLIC_GITHUB_TOKEN && {
+            'Authorization': `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`
+          })
+        }
+      })
+      
+      if (!rootResponse.ok) return null
+      
+      const rootFiles = await rootResponse.json()
+      
+      // Look for images in root directory
+      for (const name of commonImageNames) {
+        for (const ext of imageExtensions) {
+          const file = rootFiles.find((f: any) => 
+            f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
+          )
+          if (file) {
+            return `https://raw.githubusercontent.com/${username}/${repo}/main/${file.name}`
+          }
+        }
+      }
+      
+      return null
+    }
+    
+    const files = await response.json()
+    
+    if (!Array.isArray(files)) return null
+    
+    // First, try to find images with common names
+    for (const name of commonImageNames) {
+      for (const ext of imageExtensions) {
+        const file = files.find((f: any) => 
+          f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
+        )
+        if (file) {
+          return `https://raw.githubusercontent.com/${username}/${repo}/main/images/${file.name}`
+        }
+      }
+    }
+    
+    // If no common names found, get the first image file
+    const firstImage = files.find((f: any) => {
+      const fileName = f.name.toLowerCase()
+      return f.type === 'file' && imageExtensions.some(ext => fileName.endsWith(`.${ext}`))
+    })
+    
+    if (firstImage) {
+      return `https://raw.githubusercontent.com/${username}/${repo}/main/images/${firstImage.name}`
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Error fetching project image:', error)
+    return null
+  }
+}
 
 function ProjectSkeleton() {
   return (
@@ -41,6 +126,8 @@ function ProjectSkeleton() {
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const [isVisible, setIsVisible] = useState(false)
+  const [projectImage, setProjectImage] = useState<string | null>(null)
+  const [imageLoading, setImageLoading] = useState(true)
   const cardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -60,6 +147,19 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     return () => observer.disconnect()
   }, [index])
 
+  // Fetch project image from GitHub
+  useEffect(() => {
+    const fetchImage = async () => {
+      setImageLoading(true)
+      const repoName = getRepoName(project.githubUrl)
+      const imageUrl = await getProjectImage(project.githubUrl, repoName)
+      setProjectImage(imageUrl)
+      setImageLoading(false)
+    }
+
+    fetchImage()
+  }, [project.githubUrl])
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { 
@@ -67,6 +167,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       month: 'short', 
       day: 'numeric' 
     })
+  }
+
+  // Extract repository name from GitHub URL for navigation
+  const getRepoName = (githubUrl: string) => {
+    const parts = githubUrl.split('/')
+    return parts[parts.length - 1]
   }
 
   return (
@@ -78,12 +184,17 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     >
       {/* Project Image/Header */}
       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-purple-500 to-blue-600">
-        {project.image && project.image !== "/placeholder.svg" ? (
+        {imageLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <RefreshCw className="w-8 h-8 text-white opacity-80 animate-spin" />
+          </div>
+        ) : projectImage ? (
           <Image
-            src={project.image}
+            src="/background.png"
             alt={project.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
+            onError={() => setProjectImage(null)}
           />
         ) : (
           <div className="flex items-center justify-center h-full">
@@ -94,6 +205,12 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         {/* Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
           <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Link
+              href={`/project/${getRepoName(project.githubUrl)}`}
+              className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors duration-200"
+            >
+              <Eye className="w-5 h-5 text-gray-800" />
+            </Link>
             <Link
               href={project.githubUrl}
               target="_blank"
@@ -125,9 +242,13 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
       {/* Project Content */}
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 transition-colors duration-300">
-          {project.title}
-        </h3>
+        {/* Clickable Title */}
+        <Link href={`/project/${getRepoName(project.githubUrl)}`}>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 transition-colors duration-300 cursor-pointer hover:underline">
+            {project.title}
+          </h3>
+        </Link>
+        
         <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-3">
           {project.description || "No description available"}
         </p>
@@ -163,11 +284,18 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
         {/* Action Buttons */}
         <div className="flex gap-3">
+          {/* <Link
+            href={`/project/${getRepoName(project.githubUrl)}`}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300 hover:scale-105"
+          >
+            <Eye className="w-4 h-4" />
+            View Details
+          </Link> */}
           <Link
             href={project.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300 hover:scale-105"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-all duration-300 hover:scale-105"
           >
             <Github className="w-4 h-4" />
             View Code
@@ -177,7 +305,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               href={project.liveUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-all duration-300 hover:scale-105"
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:green-700 text-white rounded-lg transition-all duration-300 hover:scale-105"
             >
               <ExternalLink className="w-4 h-4" />
               Live Demo

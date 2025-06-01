@@ -372,7 +372,7 @@ export interface GitHubRepo {
       'Game Development': 'from-red-500-to-pink-500',
       'DevOps': 'from-gray-500-to-gray-700',
       'Full Stack': 'from-blue-600-to-purple-600',
-      'Frontend': 'from-cyan-400-to-blue-500',
+      'Frontend': 'from-cyan-200-to-blue-500',
       'Backend': 'from-green-600-to-blue-600',
       'Desktop': 'from-gray-600-to-gray-800',
       'Web Development': 'from-blue-500-to-purple-500',
