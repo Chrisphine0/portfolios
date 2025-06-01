@@ -40,7 +40,7 @@ const timelineData: TimelineItem[] = [
   {
     id: 1,
     year: "2024",
-    title: "Volonter ",
+    title: "Volunteer",
     company: "Tuifathi Muchanga Initiative.",
     description:
       "Leading development of Workflow applications, mentoring junior developers, and architecting scalable solutions.",
@@ -62,7 +62,7 @@ const timelineData: TimelineItem[] = [
     title: "ICT Officer Intern",
     company: "Ministry of Fisheries, Livestock and Blue Economy",
     description:
-      "Mange the ICT infrastructures and fix issues forr better prodcutivity.",
+      "Manage the ICT infrastructures and fix issues for better productivity.",
     type: "work",
     icon: <Briefcase className="w-4 h-4" />,
   },
@@ -72,24 +72,24 @@ const timelineData: TimelineItem[] = [
     title: "Computer Science Degree",
     company: "Masinde Muliro University of Science and Technology",
     description:
-      "Bachelor's degree in Computer Science with focus on software engineering and artificial intelligence.",
+      "Bachelor&apos;s degree in Computer Science with focus on software engineering and artificial intelligence.",
     type: "education",
     icon: <GraduationCap className="w-4 h-4" />,
   },
   {
     id: 5,
     year: "2019",
-    title: "Computer Colledge",
-    company: "Vocation Training Cente",
+    title: "Computer College",
+    company: "Vocational Training Centre",
     description:
-      "Here I learn design and basic computer Skills.",
+      "Here I learned design and basic computer skills.",
     type: "achievement",
     icon: <Award className="w-4 h-4" />,
   },
 ]
 
 const biographyLines = [
-  "Hello! I'm Chrisphine Miyawa, a passionate software developer with over 4 years of experience",
+  "Hello! I&apos;m Chrisphine Miyawa, a passionate software developer with over 4 years of experience",
   "creating digital solutions that make a difference. My journey began with a curiosity",
   "about how things work, which led me to discover the world of programming.",
   "",
@@ -97,9 +97,9 @@ const biographyLines = [
   "cloud technologies, and user experience design. I believe in writing clean, maintainable",
   "code and creating applications that are both functional and beautiful.",
   "",
-  "When I'm not coding, you can find me exploring new technologies, contributing to",
+  "When I&apos;m not coding, you can find me exploring new technologies, contributing to",
   "open-source projects, or sharing knowledge through technical writing and mentoring.",
-  "I'm always excited to take on new challenges and collaborate with amazing teams.",
+  "I&apos;m always excited to take on new challenges and collaborate with amazing teams.",
 ]
 
 function MouseTrackingPhoto() {
@@ -107,9 +107,11 @@ function MouseTrackingPhoto() {
   const photoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const photoElement = photoRef.current
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (photoRef.current) {
-        const rect = photoRef.current.getBoundingClientRect()
+      if (photoElement) {
+        const rect = photoElement.getBoundingClientRect()
         const centerX = rect.left + rect.width / 2
         const centerY = rect.top + rect.height / 2
 
@@ -124,15 +126,15 @@ function MouseTrackingPhoto() {
       setMousePosition({ x: 0, y: 0 })
     }
 
-    if (photoRef.current) {
-      photoRef.current.addEventListener("mousemove", handleMouseMove)
-      photoRef.current.addEventListener("mouseleave", handleMouseLeave)
+    if (photoElement) {
+      photoElement.addEventListener("mousemove", handleMouseMove)
+      photoElement.addEventListener("mouseleave", handleMouseLeave)
     }
 
     return () => {
-      if (photoRef.current) {
-        photoRef.current.removeEventListener("mousemove", handleMouseMove)
-        photoRef.current.removeEventListener("mouseleave", handleMouseLeave)
+      if (photoElement) {
+        photoElement.removeEventListener("mousemove", handleMouseMove)
+        photoElement.removeEventListener("mouseleave", handleMouseLeave)
       }
     }
   }, [])
@@ -189,7 +191,7 @@ function AnimatedBiography() {
       {biographyLines.map((line, index) => (
         <p
           key={index}
- ref={(el: HTMLParagraphElement | null) => (lineRefs.current[index] = el)}
+          ref={(el: HTMLParagraphElement | null) => (lineRefs.current[index] = el)}
           className={`text-lg text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-700 ${
             visibleLines.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           } ${line === "" ? "h-4" : ""}`}
@@ -201,7 +203,7 @@ function AnimatedBiography() {
   )
 }
 
-function SkillBar({ skill, index }: { skill: Skill; index: number }) {
+function SkillBar({ skill }: { skill: Skill }) {
   const [isVisible, setIsVisible] = useState(false)
   const [animatedValue, setAnimatedValue] = useState(0)
   const skillRef = useRef<HTMLDivElement>(null)
@@ -222,7 +224,7 @@ function SkillBar({ skill, index }: { skill: Skill; index: number }) {
               }
               setAnimatedValue(Math.round(current))
             }, 16)
-          }, index * 100)
+          }, 100)
         }
       },
       { threshold: 0.5 },
@@ -233,7 +235,7 @@ function SkillBar({ skill, index }: { skill: Skill; index: number }) {
     }
 
     return () => observer.disconnect()
-  }, [skill.percentage, index])
+  }, [skill.percentage])
 
   const getCategoryColor = (category: string) => {
     const colors = {
@@ -286,7 +288,7 @@ function Timeline() {
       <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
 
       <div className="space-y-8">
-        {timelineData.map((item, index) => (
+        {timelineData.map((item) => (
           <div
             key={item.id}
             className="relative flex items-start group"
@@ -436,8 +438,8 @@ export default function AboutPage() {
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-12 text-center">Skills & Expertise</h2>
           </ScrollSection>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {skills.map((skill, index) => (
-              <SkillBar key={skill.name} skill={skill} index={index} />
+            {skills.map((skill) => (
+              <SkillBar key={skill.name} skill={skill} />
             ))}
           </div>
         </div>
@@ -459,21 +461,21 @@ export default function AboutPage() {
       <section className="py-16 px-6 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="max-w-4xl mx-auto text-center">
           <ScrollSection>
-            <h2 className="text-4xl font-bold text-white mb-6">Let's Work Together</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">Let&apos;s Work Together</h2>
             <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-              I'm always excited to take on new challenges and collaborate with amazing teams. Let's create something
+              I&apos;m always excited to take on new challenges and collaborate with amazing teams. Let&apos;s create something
               incredible together!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contact">
-              <button className="px-8 py-4 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105">
-                Get In Touch
-              </button>
+              <Link href="/contact">
+                <button className="px-8 py-4 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+                  Get In Touch
+                </button>
               </Link>
               <Link href="/#projects">
-              <button className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition-all duration-300 hover:scale-105">
-                View My Work
-              </button>
+                <button className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition-all duration-300 hover:scale-105">
+                  View My Work
+                </button>
               </Link>
             </div>
           </ScrollSection>
