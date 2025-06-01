@@ -418,10 +418,12 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">My Story</h2>
                 <AnimatedBiography />
                 <div className="flex gap-4 mt-8">
+                <Link href="/Chrisphine_Miyawa_Resume.pdf">
                   <button className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300 hover:scale-105">
                     <Download className="w-4 h-4" />
                     Resume
                   </button>
+                  </Link>
                   <Link href="/contact">
                   <button className="flex items-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 hover:border-purple-600 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-300 hover:scale-105">
                     <Mail className="w-4 h-4" />
