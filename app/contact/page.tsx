@@ -31,6 +31,11 @@ interface FormErrors {
   message?: string
 }
 
+interface EmailJSError {
+  text?: string
+  message?: string
+}
+
 const socialLinks = [
   { name: "GitHub", icon: Github, url: "https://github.com/Chrisphine0", color: "hover:text-gray-900" },
   { name: "LinkedIn", icon: Linkedin, url: "https://linkedin.com/in/miyawachrisphine", color: "hover:text-blue-600" },
@@ -347,15 +352,16 @@ export default function ContactPage() {
         setShowConfetti(false)
       }, 3000)
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error sending email:', error)
       
       let errorMessage = "Failed to send message. Please try again."
       
-      if (error.text) {
-        errorMessage = `Error: ${error.text}`
-      } else if (error.message) {
-        errorMessage = error.message
+      const emailError = error as EmailJSError
+      if (emailError.text) {
+        errorMessage = `Error: ${emailError.text}`
+      } else if (emailError.message) {
+        errorMessage = emailError.message
       }
       
       setSubmitError(errorMessage)
@@ -388,9 +394,9 @@ export default function ContactPage() {
       <section className="pt-24 pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <ScrollSection>
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">Let's Work Together</h1>
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">Let&rsquo;s Work Together</h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Have a project in mind? I'd love to hear about it. Send me a message and let's create something amazing
+              Have a project in mind? I&rsquo;d love to hear about it. Send me a message and let&rsquo;s create something amazing
               together.
             </p>
           </ScrollSection>
@@ -505,7 +511,7 @@ export default function ContactPage() {
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
                       <p className="text-green-800 dark:text-green-200 font-medium">
-                        Message sent successfully! I'll get back to you soon.
+                        Message sent successfully! I&rsquo;ll get back to you soon.
                       </p>
                     </div>
                   </div>
