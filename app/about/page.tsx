@@ -191,7 +191,9 @@ function AnimatedBiography() {
       {biographyLines.map((line, index) => (
         <p
           key={index}
-          ref={(el: HTMLParagraphElement | null) => (lineRefs.current[index] = el)}
+          ref={(el: HTMLParagraphElement | null) => {
+            lineRefs.current[index] = el
+          }}
           className={`text-lg text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-700 ${
             visibleLines.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           } ${line === "" ? "h-4" : ""}`}
