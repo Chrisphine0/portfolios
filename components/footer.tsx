@@ -2,8 +2,8 @@ import Link from "next/link"
 import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Instagram, Heart } from "lucide-react"
 
 const socialLinks = [
-  { name: "GitHub", icon: Github, url: "https://github.com", color: "hover:text-gray-900 dark:hover:text-white" },
-  { name: "LinkedIn", icon: Linkedin, url: "https://linkedin.com", color: "hover:text-blue-600" },
+  { name: "GitHub", icon: Github, url: "https://github.com/Chrisphine0", color: "hover:text-gray-900 dark:hover:text-white" },
+  { name: "LinkedIn", icon: Linkedin, url: "https://linkedin.com/in/miyawachrisphine", color: "hover:text-blue-600" },
   { name: "Twitter", icon: Twitter, url: "https://twitter.com", color: "hover:text-blue-400" },
   { name: "Instagram", icon: Instagram, url: "https://instagram.com", color: "hover:text-pink-600" },
 ]
@@ -33,7 +33,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">AJ</span>
+                <span className="text-white font-bold text-sm">CM</span>
               </div>
               <span className="text-xl font-bold">Chrisphine Odhiambo</span>
             </Link>

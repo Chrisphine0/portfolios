@@ -21,6 +21,8 @@ export default function PersonalLanding() {
                 alt="Profile"
                 width={128}
                 height={128}
+                sizes="100vh"
+                priority
                 className="rounded-full object-cover animate-pulse-soft"
               />
               <div className="absolute inset-0 rounded-full bg-purple-400 opacity-20 animate-pulse-ring"></div>

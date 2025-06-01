@@ -7,6 +7,16 @@ import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import { Mail, Phone, MapPin, Send, Check, Github, Linkedin, Twitter, Instagram } from "lucide-react"
 
+// EmailJS integration
+import emailjs from '@emailjs/browser'
+
+// EmailJS Configuration
+const EMAILJS_CONFIG = {
+  SERVICE_ID: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+  TEMPLATE_ID: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+  PUBLIC_KEY: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!,
+}
+
 interface FormData {
   name: string
   email: string
@@ -22,8 +32,8 @@ interface FormErrors {
 }
 
 const socialLinks = [
-  { name: "GitHub", icon: Github, url: "https://github.com", color: "hover:text-gray-900" },
-  { name: "LinkedIn", icon: Linkedin, url: "https://linkedin.com", color: "hover:text-blue-600" },
+  { name: "GitHub", icon: Github, url: "https://github.com/Chrisphine0", color: "hover:text-gray-900" },
+  { name: "LinkedIn", icon: Linkedin, url: "https://linkedin.com/in/miyawachrisphine", color: "hover:text-blue-600" },
   { name: "Twitter", icon: Twitter, url: "https://twitter.com", color: "hover:text-blue-400" },
   { name: "Instagram", icon: Instagram, url: "https://instagram.com", color: "hover:text-pink-600" },
 ]
@@ -74,6 +84,7 @@ function FloatingLabelInput({
     <div className="relative">
       <InputComponent
         id={id}
+        name={id}
         type={multiline ? undefined : type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -99,22 +110,19 @@ function FloatingLabelInput({
 function SubmitButton({
   isLoading,
   isSuccess,
-  onClick,
 }: {
   isLoading: boolean
   isSuccess: boolean
-  onClick: () => void
 }) {
   return (
     <button
       type="submit"
-      onClick={onClick}
       disabled={isLoading || isSuccess}
       className={`
         relative w-full py-4 px-8 rounded-lg font-semibold text-white
         transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300
         ${isSuccess ? "bg-green-500 hover:bg-green-600" : "bg-purple-600 hover:bg-purple-700"}
-        ${isLoading || isSuccess ? "cursor-not-allowed" : "cursor-pointer"}
+        ${isLoading || isSuccess ? "cursor-not-allowed opacity-75" : "cursor-pointer"}
       `}
       aria-label={isLoading ? "Submitting form" : isSuccess ? "Form submitted successfully" : "Submit form"}
     >
@@ -239,6 +247,16 @@ export default function ContactPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [submitError, setSubmitError] = useState<string>("")
+  
+  const formRef = useRef<HTMLFormElement>(null)
+
+  // Initialize EmailJS
+  useEffect(() => {
+    if (EMAILJS_CONFIG.PUBLIC_KEY) {
+      emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY)
+    }
+  }, [])
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -285,11 +303,40 @@ export default function ContactPage() {
 
     setIsLoading(true)
     setErrors({})
+    setSubmitError("")
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Check if EmailJS is configured
+      if (!EMAILJS_CONFIG.SERVICE_ID || !EMAILJS_CONFIG.TEMPLATE_ID || !EMAILJS_CONFIG.PUBLIC_KEY) {
+        throw new Error("EmailJS configuration is missing. Please check your environment variables.")
+      }
 
+      // Log configuration for debugging (remove in production)
+      console.log('EmailJS Config:', {
+        SERVICE_ID: EMAILJS_CONFIG.SERVICE_ID ? '✓' : '✗',
+        TEMPLATE_ID: EMAILJS_CONFIG.TEMPLATE_ID ? '✓' : '✗',
+        PUBLIC_KEY: EMAILJS_CONFIG.PUBLIC_KEY ? '✓' : '✗',
+      })
+
+      // Prepare template parameters
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        to_email: 'miyawachrisphineodhiambo@gmail.com', // Your email
+      }
+
+      // Send email using EmailJS
+      const response = await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      )
+
+      console.log('Email sent successfully:', response)
+      
       setIsSuccess(true)
       setShowConfetti(true)
 
@@ -299,8 +346,19 @@ export default function ContactPage() {
         setIsSuccess(false)
         setShowConfetti(false)
       }, 3000)
-    } catch (error) {
-      setErrors({ message: "Failed to send message. Please try again." })
+
+    } catch (error: any) {
+      console.error('Error sending email:', error)
+      
+      let errorMessage = "Failed to send message. Please try again."
+      
+      if (error.text) {
+        errorMessage = `Error: ${error.text}`
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      setSubmitError(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -311,6 +369,10 @@ export default function ContactPage() {
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }))
+    }
+    // Clear submit error when user starts typing
+    if (submitError) {
+      setSubmitError("")
     }
   }
 
@@ -393,7 +455,7 @@ export default function ContactPage() {
               <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Send a Message</h2>
 
-                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                <form ref={formRef} onSubmit={handleSubmit} className="space-y-6" noValidate>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FloatingLabelInput
                       id="name"
@@ -434,7 +496,7 @@ export default function ContactPage() {
                     multiline
                   />
 
-                  <SubmitButton isLoading={isLoading} isSuccess={isSuccess} onClick={() => {}} />
+                  <SubmitButton isLoading={isLoading} isSuccess={isSuccess} />
                 </form>
 
                 {/* Success Message */}
@@ -446,6 +508,15 @@ export default function ContactPage() {
                         Message sent successfully! I'll get back to you soon.
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {submitError && (
+                  <div className="mt-6 p-4 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 rounded-lg animate-fade-in">
+                    <p className="text-red-800 dark:text-red-200 font-medium">
+                      {submitError}
+                    </p>
                   </div>
                 )}
               </div>

@@ -147,7 +147,7 @@ function MouseTrackingPhoto() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl transform rotate-6 opacity-20"></div>
         <div className="relative w-full h-full bg-white rounded-2xl overflow-hidden shadow-2xl">
-          <Image src="/profile_pic.png?height=320&width=320" alt="Chrisphine Miyawa" fill className="object-cover" />
+          <Image src="/profile_pic.png?height=320&width=320" alt="Chrisphine Miyawa" fill className="object-cover" sizes="100vh" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
         </div>
         <div className="absolute -inset-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl opacity-20 blur-xl"></div>
@@ -189,7 +189,7 @@ function AnimatedBiography() {
       {biographyLines.map((line, index) => (
         <p
           key={index}
-          ref={(el) => (lineRefs.current[index] = el)}
+ ref={(el: HTMLParagraphElement | null) => (lineRefs.current[index] = el)}
           className={`text-lg text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-700 ${
             visibleLines.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           } ${line === "" ? "h-4" : ""}`}
