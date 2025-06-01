@@ -38,7 +38,7 @@ export default function Footer() {
               <span className="text-xl font-bold">Chrisphine Odhiambo</span>
             </Link>
             <p className="text-gray-400 mb-6 leading-relaxed">
-              Passionate software developer creating digital solutions that make a difference. Let&apos;s build something
+              Passionate software developer creating digital solutions that make a difference. Let's build something
               amazing together.
             </p>
             <div className="flex space-x-4">
