@@ -72,7 +72,7 @@ const timelineData: TimelineItem[] = [
     title: "Computer Science Degree",
     company: "Masinde Muliro University of Science and Technology",
     description:
-      "Bachelor&apos;s degree in Computer Science with focus on software engineering and artificial intelligence.",
+      "Bachelor's degree in Computer Science with focus on software engineering and artificial intelligence.",
     type: "education",
     icon: <GraduationCap className="w-4 h-4" />,
   },
@@ -89,7 +89,7 @@ const timelineData: TimelineItem[] = [
 ]
 
 const biographyLines = [
-  "Hello! I&apos;m Chrisphine Miyawa, a passionate software developer with over 4 years of experience",
+  "Hello! I'm Chrisphine Miyawa, a passionate software developer with over 4 years of experience",
   "creating digital solutions that make a difference. My journey began with a curiosity",
   "about how things work, which led me to discover the world of programming.",
   "",
@@ -97,9 +97,9 @@ const biographyLines = [
   "cloud technologies, and user experience design. I believe in writing clean, maintainable",
   "code and creating applications that are both functional and beautiful.",
   "",
-  "When I&apos;m not coding, you can find me exploring new technologies, contributing to",
+  "When I'm not coding, you can find me exploring new technologies, contributing to",
   "open-source projects, or sharing knowledge through technical writing and mentoring.",
-  "I&apos;m always excited to take on new challenges and collaborate with amazing teams.",
+  "I'm always excited to take on new challenges and collaborate with amazing teams.",
 ]
 
 function MouseTrackingPhoto() {
@@ -467,9 +467,9 @@ export default function AboutPage() {
       <section className="py-16 px-6 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="max-w-4xl mx-auto text-center">
           <ScrollSection>
-            <h2 className="text-4xl font-bold text-white mb-6">Let&apos;s Work Together</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">Let's Work Together</h2>
             <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-              I&apos;m always excited to take on new challenges and collaborate with amazing teams. Let&apos;s create something
+              I'm always excited to take on new challenges and collaborate with amazing teams. Let's create something
               incredible together!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
