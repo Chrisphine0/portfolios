@@ -89,7 +89,7 @@ const timelineData: TimelineItem[] = [
 ]
 
 const biographyLines = [
-  "Hello! I&apos;m Chrisphine Miyawa, a passionate software developer with over 4 years of experience",
+  "Hello! I'm Chrisphine Miyawa, a passionate software developer with over 4 years of experience",
   "creating digital solutions that make a difference. My journey began with a curiosity",
   "about how things work, which led me to discover the world of programming.",
   "",
