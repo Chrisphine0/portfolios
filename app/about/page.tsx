@@ -422,10 +422,12 @@ export default function AboutPage() {
                     <Download className="w-4 h-4" />
                     Resume
                   </button>
+                  <Link href="/contact">
                   <button className="flex items-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-600 hover:border-purple-600 text-gray-700 dark:text-gray-300 rounded-lg transition-all duration-300 hover:scale-105">
                     <Mail className="w-4 h-4" />
                     Contact
                   </button>
+                  </Link>
                 </div>
               </div>
             </ScrollSection>
