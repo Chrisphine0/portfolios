@@ -467,8 +467,10 @@ export default function AboutPage() {
       <section className="py-16 px-6 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="max-w-4xl mx-auto text-center">
           <ScrollSection>
-            <h2 className="text-4xl font-bold text-white mb-6">Let's Work Together</h2>
-            <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">I'm always excited to take on new challenges and collaborate with amazing teams. Let's create something incredible together!
+            <h2 className="text-4xl font-bold text-white mb-6">Lets Work Together</h2>
+            <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
+              Im always excited to take on new challenges and collaborate with amazing teams. Lets create something
+              incredible together!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/contact">
