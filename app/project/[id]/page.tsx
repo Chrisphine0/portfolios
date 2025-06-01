@@ -7,7 +7,7 @@ import Link from "next/link"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 import { Calendar, Users, Code, Zap, Star, GitFork, ExternalLink, Github } from "lucide-react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import { getGitHubConfig, GitHubRepo, techColors } from "@/utils/github"
 
 interface GitHubProjectDetail {
@@ -162,8 +162,8 @@ async function fetchGitHubRepoDetail(repoName: string): Promise<GitHubRepo | nul
     }
 
     return await response.json()
-  } catch (error) {
-    console.error('Error fetching repository details:', error)
+  } catch (fetchError) {
+    console.error('Error fetching repository details:', fetchError)
     return null
   }
 }
@@ -199,8 +199,8 @@ async function fetchReadmeContent(repoName: string): Promise<string> {
     }
     
     return ""
-  } catch (error) {
-    console.error('Error fetching README:', error)
+  } catch (fetchError) {
+    console.error('Error fetching README:', fetchError)
     return ""
   }
 }
@@ -268,15 +268,16 @@ async function fetchRepoImages(repoName: string): Promise<string[]> {
             }
           })
         }
-      } catch (error) {
+      } catch (dirError) {
         // Continue if directory doesn't exist
+        console.log('Directory not found:', path, dirError)
         continue
       }
     }
 
     return images.slice(0, 6) // Limit to 6 images
-  } catch (error) {
-    console.error('Error fetching repository images:', error)
+  } catch (fetchError) {
+    console.error('Error fetching repository images:', fetchError)
     return []
   }
 }
@@ -421,7 +422,6 @@ function calculateDuration(createdAt: string, updatedAt: string): string {
 
 export default function ProjectDetailPage() {
   const params = useParams()
-  const router = useRouter()
   const [scrollY, setScrollY] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [project, setProject] = useState<GitHubProjectDetail | null>(null)
@@ -452,8 +452,8 @@ export default function ProjectDetailPage() {
         const projectDetail = convertRepoToProjectDetail(repo, readmeContent, images)
         setProject(projectDetail)
 
-      } catch (error) {
-        console.error('Error fetching project data:', error)
+      } catch (fetchError) {
+        console.error('Error fetching project data:', fetchError)
         setError('Failed to load project data')
       } finally {
         setIsLoading(false)

@@ -6,6 +6,19 @@ import Link from "next/link"
 import { ExternalLink, Github, Star, GitFork, RefreshCw, Eye } from "lucide-react"
 import { getGitHubProjects, techColors, type Project } from "../utils/github"
 
+// Type definitions for GitHub API responses
+interface GitHubFile {
+  name: string
+  type: 'file' | 'dir'
+  path: string
+  sha: string
+  size: number
+  url: string
+  html_url: string
+  git_url: string
+  download_url: string | null
+}
+
 // Function to get image from GitHub repository
 const getProjectImage = async (githubUrl: string, repoName: string): Promise<string | null> => {
   try {
@@ -43,12 +56,12 @@ const getProjectImage = async (githubUrl: string, repoName: string): Promise<str
       
       if (!rootResponse.ok) return null
       
-      const rootFiles = await rootResponse.json()
+      const rootFiles: GitHubFile[] = await rootResponse.json()
       
       // Look for images in root directory
       for (const name of commonImageNames) {
         for (const ext of imageExtensions) {
-          const file = rootFiles.find((f: any) => 
+          const file = rootFiles.find((f: GitHubFile) => 
             f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
           )
           if (file) {
@@ -60,14 +73,14 @@ const getProjectImage = async (githubUrl: string, repoName: string): Promise<str
       return null
     }
     
-    const files = await response.json()
+    const files: GitHubFile[] = await response.json()
     
     if (!Array.isArray(files)) return null
     
     // First, try to find images with common names
     for (const name of commonImageNames) {
       for (const ext of imageExtensions) {
-        const file = files.find((f: any) => 
+        const file = files.find((f: GitHubFile) => 
           f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
         )
         if (file) {
@@ -77,7 +90,7 @@ const getProjectImage = async (githubUrl: string, repoName: string): Promise<str
     }
     
     // If no common names found, get the first image file
-    const firstImage = files.find((f: any) => {
+    const firstImage = files.find((f: GitHubFile) => {
       const fileName = f.name.toLowerCase()
       return f.type === 'file' && imageExtensions.some(ext => fileName.endsWith(`.${ext}`))
     })
