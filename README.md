@@ -35,7 +35,6 @@ git clone https://github.com/chrisphine0/personal-portfolio.git
 cd personal-portfolio
 ```
 
-
 2. Install dependencies:
 
 ```shellscript
