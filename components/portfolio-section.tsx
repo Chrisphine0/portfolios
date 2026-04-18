@@ -43,19 +43,45 @@ const getProjectImage = async (githubUrl: string, repoName: string): Promise<str
       }
     })
     
-    if (!response.ok) {
-      // If images folder doesn't exist, try root directory
-      const rootResponse = await fetch(`https://api.github.com/repos/${username}/${repo}/contents`, {
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-          ...(process.env.NEXT_PUBLIC_GITHUB_TOKEN && {
-            'Authorization': `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`
-          })
+    if (response.ok) {
+      const files: GitHubFile[] = await response.json()
+    
+      if (Array.isArray(files)) {
+        // First, try to find images with common names
+        for (const name of commonImageNames) {
+          for (const ext of imageExtensions) {
+            const file = files.find((f: GitHubFile) => 
+              f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
+            )
+            if (file) {
+              return file.download_url
+            }
+          }
         }
-      })
-      
-      if (!rootResponse.ok) return null
-      
+        
+        // If no common names found, get the first image file
+        const firstImage = files.find((f: GitHubFile) => {
+          const fileName = f.name.toLowerCase()
+          return f.type === 'file' && imageExtensions.some(ext => fileName.endsWith(`.${ext}`))
+        })
+        
+        if (firstImage) {
+          return firstImage.download_url
+        }
+      }
+    }
+
+    // If images folder doesn't exist or is empty, try root directory
+    const rootResponse = await fetch(`https://api.github.com/repos/${username}/${repo}/contents`, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        ...(process.env.NEXT_PUBLIC_GITHUB_TOKEN && {
+          'Authorization': `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`
+        })
+      }
+    })
+    
+    if (rootResponse.ok) {
       const rootFiles: GitHubFile[] = await rootResponse.json()
       
       // Look for images in root directory
@@ -65,38 +91,20 @@ const getProjectImage = async (githubUrl: string, repoName: string): Promise<str
             f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
           )
           if (file) {
-            return `https://raw.githubusercontent.com/${username}/${repo}/main/${file.name}`
+            return file.download_url
           }
         }
       }
-      
-      return null
-    }
-    
-    const files: GitHubFile[] = await response.json()
-    
-    if (!Array.isArray(files)) return null
-    
-    // First, try to find images with common names
-    for (const name of commonImageNames) {
-      for (const ext of imageExtensions) {
-        const file = files.find((f: GitHubFile) => 
-          f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
-        )
-        if (file) {
-          return `https://raw.githubusercontent.com/${username}/${repo}/main/images/${file.name}`
-        }
+
+      // If no common name is found, find the first image file in the root directory.
+      const firstImageInRoot = rootFiles.find((f: GitHubFile) => {
+          const fileName = f.name.toLowerCase()
+          return f.type === 'file' && imageExtensions.some(ext => fileName.endsWith(`.${ext}`))
+      });
+
+      if (firstImageInRoot) {
+          return firstImageInRoot.download_url;
       }
-    }
-    
-    // If no common names found, get the first image file
-    const firstImage = files.find((f: GitHubFile) => {
-      const fileName = f.name.toLowerCase()
-      return f.type === 'file' && imageExtensions.some(ext => fileName.endsWith(`.${ext}`))
-    })
-    
-    if (firstImage) {
-      return `https://raw.githubusercontent.com/${username}/${repo}/main/images/${firstImage.name}`
     }
     
     return null
