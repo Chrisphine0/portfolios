@@ -409,7 +409,8 @@ function ContactForm() {
   }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8">
+    <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 relative">
+        {showConfetti && <ConfettiAnimation />}
       <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Send a Message</h2>
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-6" noValidate>
@@ -482,9 +483,6 @@ export default function ContactPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="min-h-screen bg-white dark:bg-gray-900">
-        {/* Confetti Animation */}
-        {false && <ConfettiAnimation />}
-
         {/* Navigation */}
         <Navigation />
 
