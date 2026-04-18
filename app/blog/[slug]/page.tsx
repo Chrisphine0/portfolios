@@ -4,46 +4,23 @@ import { useState, useEffect } from 'react'
 import { notFound } from 'next/navigation'
 import Navigation from '@/components/navigation'
 import Footer from '@/components/footer'
-
-interface Post {
-  slug: string
-  title: string
-  content: string
-  date: string
-}
-
-// Dummy function to simulate fetching a single post
-const getPost = async (slug: string): Promise<Post | null> => {
-  const posts: Post[] = [
-    {
-      slug: 'my-first-post',
-      title: 'My First Blog Post',
-      content: `<p>This is the full content of my first post. It's a great start to a long and fruitful blogging journey. I'll be sharing my thoughts on web development, a bit of design, and maybe even some personal projects.</p><p>Stay tuned for more updates!</p>`,
-      date: '2024-08-01',
-    },
-    {
-      slug: 'understanding-react-hooks',
-      title: 'Understanding React Hooks',
-      content: `<p>React Hooks have revolutionized how we write components. In this post, we'll explore the most common hooks and how to use them effectively.</p><h2>useState</h2><p>The <code>useState</code> hook is the most basic and essential hook for managing state in a functional component.</p><h2>useEffect</h2><p>The <code>useEffect</code> hook lets you perform side effects in functional components, such as data fetching, subscriptions, or manually changing the DOM.</p>`,
-      date: '2024-08-05',
-    },
-  ]
-  return posts.find((p) => p.slug === slug) || null
-}
+import { getPostData, type PostData } from '@/lib/posts'
 
 export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const [post, setPost] = useState<Post | null>(null)
+  const [post, setPost] = useState<PostData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchPost = async () => {
-      setIsLoading(true)
-      const fetchedPost = await getPost(params.slug)
-      if (!fetchedPost) {
+      try {
+        setIsLoading(true)
+        const fetchedPost = await getPostData(params.slug)
+        setPost(fetchedPost)
+      } catch (error) {
         notFound()
+      } finally {
+        setIsLoading(false)
       }
-      setPost(fetchedPost)
-      setIsLoading(false)
     }
     fetchPost()
   }, [params.slug])
@@ -68,7 +45,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
     )
   }
 
-  if (!post) return null // This will be handled by notFound() in useEffect
+  if (!post) return null // Handled by notFound() in useEffect
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">

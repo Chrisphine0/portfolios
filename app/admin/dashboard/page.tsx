@@ -11,21 +11,13 @@ interface Post {
   date: string
 }
 
-// Dummy function to simulate fetching posts
-const getAdminPosts = async (): Promise<Post[]> => {
-  return [
-    { slug: 'my-first-post', title: 'My First Blog Post', date: '2024-08-01' },
-    { slug: 'understanding-react-hooks', title: 'Understanding React Hooks', date: '2024-08-05' },
-  ]
-}
-
 export default function AdminDashboard() {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
-    // Protect the route
     const isAuthenticated = sessionStorage.getItem('isAdminAuthenticated') === 'true'
     if (!isAuthenticated) {
       router.replace('/admin/login')
@@ -34,30 +26,39 @@ export default function AdminDashboard() {
 
     const fetchPosts = async () => {
       setIsLoading(true)
-      const fetchedPosts = await getAdminPosts()
-      setPosts(fetchedPosts)
-      setIsLoading(false)
+      try {
+        const res = await fetch('/api/posts', {
+          headers: { 'Authorization': `Bearer ${process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'password'}` }
+        })
+        if (!res.ok) throw new Error('Failed to fetch posts.')
+        const data = await res.json()
+        setPosts(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred.')
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     fetchPosts()
   }, [router])
 
-  // Handle deletion of a post
-  const handleDelete = (slug: string) => {
+  const handleDelete = async (slug: string) => {
     if (confirm('Are you sure you want to delete this post?')) {
-      // Here you would call an API to delete the post
-      console.log(`Deleting post: ${slug}`)
-      setPosts(posts.filter(p => p.slug !== slug))
+      try {
+        const res = await fetch(`/api/posts/${slug}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'password'}` },
+        })
+        if (!res.ok) throw new Error('Failed to delete post.')
+        setPosts(posts.filter(p => p.slug !== slug))
+      } catch (err) {
+        alert(err instanceof Error ? err.message : 'An unknown error occurred.')
+      }
     }
   }
 
-  if (isLoading) {
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-          <p className="text-lg text-gray-600 dark:text-gray-300">Loading dashboard...</p>
-        </div>
-    )
-  }
+  if (!sessionStorage.getItem('isAdminAuthenticated')) return null
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -72,34 +73,40 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-10">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-            {posts.length > 0 ? (
-              posts.map(post => (
-                <li key={post.slug} className="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{post.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Published on {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Link href={`/admin/editor/${post.slug}`} className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                      <Edit className="w-5 h-5" />
-                    </Link>
-                    <button onClick={() => handleDelete(post.slug)} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors">
-                      <Trash className="w-5 h-5" />
-                    </button>
-                  </div>
+        {isLoading ? (
+          <div className="text-center text-gray-600 dark:text-gray-300">Loading posts...</div>
+        ) : error ? (
+          <div className="text-center text-red-500">Error: {error}</div>
+        ) : (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+              {posts.length > 0 ? (
+                posts.map(post => (
+                  <li key={post.slug} className="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{post.title}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Published on {new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Link href={`/admin/editor/${post.slug}`} className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                        <Edit className="w-5 h-5" />
+                      </Link>
+                      <button onClick={() => handleDelete(post.slug)} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors">
+                        <Trash className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <li className="p-6 text-center text-gray-500 dark:text-gray-400">
+                  <p>No posts yet. Time to write something amazing!</p>
                 </li>
-              ))
-            ) : (
-              <li className="p-6 text-center text-gray-500 dark:text-gray-400">
-                <p>No posts yet. Time to write something amazing!</p>
-              </li>
-            )}
-          </ul>
-        </div>
+              )}
+            </ul>
+          </div>
+        )}
       </main>
     </div>
   )
