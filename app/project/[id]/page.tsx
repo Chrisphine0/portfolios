@@ -242,7 +242,7 @@ async function fetchRepoImages(repoName: string): Promise<string[]> {
           file.name.toLowerCase().endsWith(ext)
         )
         if (hasImageExt) {
-          images.push(file.download_url)
+            images.push(`https://raw.githubusercontent.com/${config.username}/${repoName}/main/${file.path}`)
         }
       }
     })
@@ -263,7 +263,7 @@ async function fetchRepoImages(repoName: string): Promise<string[]> {
                 file.name.toLowerCase().endsWith(ext)
               )
               if (hasImageExt) {
-                images.push(file.download_url)
+                images.push(`https://raw.githubusercontent.com/${config.username}/${repoName}/main/${file.path}`)
               }
             }
           })
@@ -510,72 +510,57 @@ export default function ProjectDetailPage() {
       {/* Navigation */}
       <Navigation />
 
-      {/* Hero Section with Parallax */}
-      <section className="relative h-screen overflow-hidden">
-        <div
-          className="absolute inset-0 w-full h-[120%]"
-          style={{
-            transform: `translateY(${scrollY * 0.5}px)`,
-          }}
-        >
-          <Image
-            src={project.heroImage}
-            alt={project.title}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
-
-        <div className="relative z-10 h-full flex items-center justify-center text-center text-white px-6">
-          <div className="max-w-4xl mx-auto">
-            <ScrollSection>
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <span className="inline-block px-4 py-2 bg-purple-600 rounded-full text-sm font-semibold">
-                  {project.category}
-                </span>
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4" />
-                    <span>{project.stars}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <GitFork className="w-4 h-4" />
-                    <span>{project.forks}</span>
-                  </div>
+      {/* New Hero Section */}
+      <section className="py-20 md:py-32">
+        <div className="container mx-auto px-6">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div className="relative aspect-video rounded-lg overflow-hidden shadow-lg">
+                    <Image
+                        src={project.heroImage}
+                        alt={project.title}
+                        fill
+                        className="object-cover"
+                        priority
+                    />
                 </div>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold mb-4">{project.title}</h1>
-              <p className="text-xl md:text-2xl text-gray-200 mb-8">{project.subtitle}</p>
-              <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">{project.description}</p>
-              
-              <div className="flex justify-center gap-4">
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <Github className="w-5 h-5 mr-2" />
-                  View on GitHub
-                </a>
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
-                  >
-                    <ExternalLink className="w-5 h-5 mr-2" />
-                    Live Demo
-                  </a>
-                )}
-              </div>
-            </ScrollSection>
-          </div>
+                <div>
+                    <span className="inline-block px-4 py-2 bg-purple-600 rounded-full text-sm font-semibold text-white">
+                        {project.category}
+                    </span>
+                    <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-4 text-gray-900 dark:text-white">{project.title}</h1>
+                    <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">{project.subtitle}</p>
+                    <div className="flex items-center gap-6 mb-8 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-2">
+                            <Star className="w-5 h-5" />
+                            <span>{project.stars} Stars</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <GitFork className="w-5 h-5" />
+                            <span>{project.forks} Forks</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Calendar className="w-5 h-5" />
+                            <span>Updated {new Date(project.lastUpdated).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-200 mb-8">{project.description}</p>
+                    <div className="flex gap-4">
+                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                            <Github className="w-5 h-5 mr-2" />
+                            View on GitHub
+                        </a>
+                        {project.liveUrl && (
+                            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                                <ExternalLink className="w-5 h-5 mr-2" />
+                                Live Demo
+                            </a>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
-      </section>
+    </section>
+
 
       {/* Project Info */}
       <ScrollSection className="py-16 px-6">
