@@ -4,43 +4,18 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import Navigation from '@/components/navigation'
 import Footer from '@/components/footer'
-
-interface Post {
-  slug: string
-  title: string
-  excerpt: string
-  date: string
-}
-
-// Dummy function to simulate fetching posts
-// In a real app, this would fetch from a CMS or local markdown files
-const getPosts = async (): Promise<Post[]> => {
-  // For now, we return a hardcoded list. I will implement full markdown support later.
-  return [
-    {
-      slug: 'my-first-post',
-      title: 'My First Blog Post',
-      excerpt: 'This is the beginning of my journey into technical writing. Stay tuned for more!',
-      date: '2024-08-01',
-    },
-    {
-      slug: 'understanding-react-hooks',
-      title: 'Understanding React Hooks',
-      excerpt: 'A deep dive into useState, useEffect, and other essential React hooks.',
-      date: '2024-08-05',
-    },
-  ]
-}
+import { getSortedPostsData, type PostData } from '@/lib/posts'
 
 export default function BlogPage() {
-  const [posts, setPosts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<Omit<PostData, 'content'>[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchPosts = async () => {
       setIsLoading(true)
-      const fetchedPosts = await getPosts()
-      setPosts(fetchedPosts)
+      // Since getSortedPostsData is synchronous, we can remove the async/await
+      const allPosts = getSortedPostsData()
+      setPosts(allPosts)
       setIsLoading(false)
     }
     fetchPosts()
