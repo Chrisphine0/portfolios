@@ -11,7 +11,7 @@ export default function PersonalLanding() {
       <Navigation />
 
       {/* Hero Section */}
-      <main className="min-h-screen flex items-center justify-center px-6 my-22">
+      <main className="min-h-screen flex items-center justify-center px-6">
         <div className="text-center max-w-4xl mx-auto">
           {/* Profile Image */}
           <div className="mb-8 animate-fade-in-delay-2">
