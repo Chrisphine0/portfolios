@@ -117,13 +117,13 @@ export default function Footer() {
               <span>and lots of coffee.</span>
             </div>
             <div className="flex space-x-6 text-sm text-gray-400">
-              <Link href="#" className="hover:text-white transition-colors duration-300">
+              <Link href="/privacy-policy" className="hover:text-white transition-colors duration-300">
                 Privacy Policy
               </Link>
-              <Link href="#" className="hover:text-white transition-colors duration-300">
+              <Link href="/terms-of-service" className="hover:text-white transition-colors duration-300">
                 Terms of Service
               </Link>
-              <Link href="#" className="hover:text-white transition-colors duration-300">
+              <Link href="/sitemap" className="hover:text-white transition-colors duration-300">
                 Sitemap
               </Link>
             </div>
