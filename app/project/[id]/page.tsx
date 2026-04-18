@@ -519,7 +519,7 @@ export default function ProjectDetailPage() {
           }}
         >
           <Image
-            src="/background.png"
+            src={project.heroImage}
             alt={project.title}
             fill
             className="object-cover"
