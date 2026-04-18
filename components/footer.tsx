@@ -16,10 +16,10 @@ const quickLinks = [
 ]
 
 const services = [
-  { name: "Web Development", href: "#" },
-  { name: "Mobile Apps", href: "#" },
-  { name: "UI/UX Design", href: "#" },
-  { name: "Consulting", href: "#" },
+  { name: "Web Development"},
+  { name: "Mobile Apps"},
+  { name: "UI/UX Design"},
+  { name: "Consulting"},
 ]
 
 export default function Footer() {
@@ -80,7 +80,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {services.map((service) => (
                 <li key={service.name}>
-                  <Link href={service.href} className="text-gray-400 hover:text-white transition-colors duration-300">
+                  <Link href={`/contact?subject=${encodeURIComponent(service.name)}`} className="text-gray-400 hover:text-white transition-colors duration-300">
                     {service.name}
                   </Link>
                 </li>
