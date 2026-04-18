@@ -203,7 +203,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           </div>
         ) : projectImage ? (
           <Image
-            src="/background.png"
+            src={projectImage}
             alt={project.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
