@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useRef } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ExternalLink, Github, Star, GitFork, RefreshCw, Eye } from "lucide-react"
-import { getGitHubProjects, techColors, type Project } from "../utils/github"
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { ExternalLink, Github, Star, GitFork, RefreshCw, Eye, Code } from 'lucide-react'
+import { getGitHubProjects, techColors, type Project } from '../utils/github'
 
 // Type definitions for GitHub API responses
 interface GitHubFile {
@@ -26,87 +26,63 @@ const getProjectImage = async (githubUrl: string, repoName: string): Promise<str
     const urlParts = githubUrl.split('/')
     const username = urlParts[urlParts.length - 2]
     const repo = urlParts[urlParts.length - 1]
-    
+
     // Common image extensions to check
     const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']
-    const commonImageNames = ['screenshot', 'preview', 'demo', 'cover', 'banner', repoName.toLowerCase()]
-    
-    // GitHub API endpoint for repository contents
-    const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/images/`
-    
-    const response = await fetch(apiUrl, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        ...(process.env.NEXT_PUBLIC_GITHUB_TOKEN && {
-          'Authorization': `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`
-        })
-      }
-    })
-    
-    if (response.ok) {
-      const files: GitHubFile[] = await response.json()
-    
-      if (Array.isArray(files)) {
-        // First, try to find images with common names
-        for (const name of commonImageNames) {
-          for (const ext of imageExtensions) {
-            const file = files.find((f: GitHubFile) => 
-              f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
-            )
-            if (file) {
-              return file.download_url
+    const commonImageNames = [
+      'screenshot.png',
+      'screenshot',
+      'preview',
+      'demo',
+      'cover',
+      'banner',
+      repoName.toLowerCase(),
+    ]
+
+    const checkLocations = ['images/', ''] // Check in `/images` and then root
+
+    for (const location of checkLocations) {
+      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${location}`
+
+      const response = await fetch(apiUrl, {
+        headers: {
+          Accept: 'application/vnd.github.v3+json',
+          ...(process.env.NEXT_PUBLIC_GITHUB_TOKEN && {
+            Authorization: `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+          }),
+        },
+      })
+
+      if (response.ok) {
+        const files: GitHubFile[] = await response.json()
+
+        if (Array.isArray(files)) {
+          // Prioritize specific image names
+          for (const name of commonImageNames) {
+            for (const ext of imageExtensions) {
+              const fullName = name.includes('.') ? name : `${name}.${ext}`
+              const file = files.find(
+                (f: GitHubFile) => f.name.toLowerCase() === fullName && f.type === 'file',
+              )
+              if (file) {
+                return file.download_url
+              }
             }
           }
-        }
-        
-        // If no common names found, get the first image file
-        const firstImage = files.find((f: GitHubFile) => {
-          const fileName = f.name.toLowerCase()
-          return f.type === 'file' && imageExtensions.some(ext => fileName.endsWith(`.${ext}`))
-        })
-        
-        if (firstImage) {
-          return firstImage.download_url
-        }
-      }
-    }
 
-    // If images folder doesn't exist or is empty, try root directory
-    const rootResponse = await fetch(`https://api.github.com/repos/${username}/${repo}/contents`, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        ...(process.env.NEXT_PUBLIC_GITHUB_TOKEN && {
-          'Authorization': `token ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`
-        })
-      }
-    })
-    
-    if (rootResponse.ok) {
-      const rootFiles: GitHubFile[] = await rootResponse.json()
-      
-      // Look for images in root directory
-      for (const name of commonImageNames) {
-        for (const ext of imageExtensions) {
-          const file = rootFiles.find((f: GitHubFile) => 
-            f.name.toLowerCase() === `${name}.${ext}` && f.type === 'file'
-          )
-          if (file) {
-            return file.download_url
+          // Fallback to the first available image
+          const firstImage = files.find((f: GitHubFile) => {
+            const fileName = f.name.toLowerCase()
+            return f.type === 'file' && imageExtensions.some((ext) => fileName.endsWith(`.${ext}`))
+          })
+
+          if (firstImage) {
+            return firstImage.download_url
           }
         }
       }
-
-      // If no common name is found, find the first image file in the root directory.
-      const firstImageInRoot = rootFiles.find((f: GitHubFile) => {
-          const fileName = f.name.toLowerCase()
-          return f.type === 'file' && imageExtensions.some(ext => fileName.endsWith(`.${ext}`))
-      });
-
-      if (firstImageInRoot) {
-          return firstImageInRoot.download_url;
-      }
     }
-    
+
     return null
   } catch (error) {
     console.error('Error fetching project image:', error)
@@ -183,11 +159,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    })
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
   }
 
   // Extract repository name from GitHub URL for navigation
@@ -200,7 +172,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     <div
       ref={cardRef}
       className={`group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform ${
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       } hover:-translate-y-2`}
     >
       {/* Project Image/Header */}
@@ -215,14 +187,25 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             alt={project.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
-            onError={() => setProjectImage(null)}
+            onError={() => setProjectImage(null)} // Fallback if image fails to load
           />
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <Github className="w-16 h-16 text-white opacity-80" />
+          // Fallback: Show technology icons
+          <div className="flex flex-wrap items-center justify-center h-full p-4 gap-4 bg-gray-800">
+            {project.technologies.length > 0 ? (
+              project.technologies.slice(0, 5).map((tech) => (
+                <div
+                  key={tech}
+                  className={`p-2 rounded-full transition-all duration-300 transform group-hover:scale-110 ${techColors[tech] || 'bg-gray-600'}`}>
+                  <Code className="w-6 h-6 text-white" />
+                </div>
+              ))
+            ) : (
+              <Github className="w-16 h-16 text-white opacity-80" />
+            )}
           </div>
         )}
-        
+
         {/* Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
           <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -252,7 +235,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             )}
           </div>
         </div>
-        
+
         {/* Category Badge */}
         <div className="absolute top-3 right-3">
           <span className="px-3 py-1 bg-purple-600 text-white text-xs font-semibold rounded-full">
@@ -269,9 +252,9 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             {project.title}
           </h3>
         </Link>
-        
+
         <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-3">
-          {project.description || "No description available"}
+          {project.description || 'No description available'}
         </p>
 
         {/* Tech Stack */}
@@ -280,7 +263,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             <span
               key={tech}
               className={`px-3 py-1 text-xs font-medium text-white rounded-full transition-all duration-300 transform hover:scale-105 ${
-                techColors[tech] || "bg-gray-500 hover:bg-gray-600"
+                techColors[tech] || 'bg-gray-500 hover:bg-gray-600'
               }`}
             >
               {tech}
@@ -305,13 +288,6 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 
         {/* Action Buttons */}
         <div className="flex gap-3">
-          {/* <Link
-            href={`/project/${getRepoName(project.githubUrl)}`}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300 hover:scale-105"
-          >
-            <Eye className="w-4 h-4" />
-            View Details
-          </Link> */}
           <Link
             href={project.githubUrl}
             target="_blank"
@@ -367,33 +343,39 @@ export default function PortfolioSection() {
     return (
       <section className="py-20 px-6 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Featured Projects</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            Featured Projects
+          </h2>
           <div className="bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-8">
             <p>Error loading projects: {error}</p>
-            <p className="text-sm mt-2">Please check your GitHub configuration in the environment variables.</p>
+            <p className="text-sm mt-2">
+              Please check your GitHub configuration in the environment variables.
+            </p>
           </div>
-            <button 
-              onClick={fetchGitHubProjects}
-              disabled={isLoading}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-lg transition-colors duration-300"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              {isLoading ? 'Retrying...' : 'Retry'}
-            </button>
+          <button
+            onClick={fetchGitHubProjects}
+            disabled={isLoading}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-lg transition-colors duration-300"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            {isLoading ? 'Retrying...' : 'Retry'}
+          </button>
         </div>
       </section>
     )
   }
 
   return (
-    <section className="py-20 px-6 bg-gray-50 dark:bg-gray-900">
+    <section className="py-20 px-6 bg-gray-50 dark:bg-gray-900" id="projects">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Featured Projects</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            Featured Projects
+          </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            A showcase of my recent work from GitHub, featuring modern web applications, mobile apps, and innovative solutions built
-            with cutting-edge technologies.
+            A showcase of my recent work from GitHub, featuring modern web applications, mobile
+            apps, and innovative solutions built with cutting-edge technologies.
           </p>
         </div>
 
@@ -401,7 +383,9 @@ export default function PortfolioSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {isLoading
             ? Array.from({ length: 6 }).map((_, index) => <ProjectSkeleton key={index} />)
-            : projects.map((project, index) => <ProjectCard key={project.id} project={project} index={index} />)}
+            : projects.map((project, index) => (
+                <ProjectCard key={project.id} project={project} index={index} />
+              ))}
         </div>
 
         {/* View More Button */}
@@ -422,7 +406,9 @@ export default function PortfolioSection() {
         {/* No Projects Message */}
         {!isLoading && projects.length === 0 && !error && (
           <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-300">No projects found. Make sure your repositories are public and have descriptions.</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              No projects found. Make sure your repositories are public and have descriptions.
+            </p>
           </div>
         )}
       </div>
