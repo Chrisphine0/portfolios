@@ -422,7 +422,6 @@ function calculateDuration(createdAt: string, updatedAt: string): string {
 
 export default function ProjectDetailPage() {
   const params = useParams()
-  const [scrollY, setScrollY] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [project, setProject] = useState<GitHubProjectDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -464,12 +463,6 @@ export default function ProjectDetailPage() {
       fetchProjectData()
     }
   }, [repoName])
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   if (isLoading) {
     return (
