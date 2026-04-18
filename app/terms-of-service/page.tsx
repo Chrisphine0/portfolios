@@ -34,7 +34,7 @@ export default function TermsOfService() {
               remove any copyright or other proprietary notations from the materials; or
             </li>
             <li>
-              transfer the materials to another person or "mirror" the materials on any other
+              transfer the materials to another person or &quot;mirror&quot; the materials on any other
               server.
             </li>
           </ul>
@@ -45,7 +45,7 @@ export default function TermsOfService() {
             materials in your possession whether in electronic or printed format.
           </p>
           <p>
-            The materials on this website are provided on an 'as is' basis. We make no
+            The materials on this website are provided on an &apos;as is&apos; basis. We make no
             warranties, expressed or implied, and hereby disclaim and negate all other
             warranties including, without limitation, implied warranties or conditions of
             merchantability, fitness for a particular purpose, or non-infringement of
@@ -68,7 +68,7 @@ export default function TermsOfService() {
           <p>
             We have not reviewed all of the sites linked to this website and are not responsible
             for the contents of any such linked site. The inclusion of any link does not imply
-            endorsement by us of the site. Use of any such linked website is at the user's own
+            endorsement by us of the site. Use of any such linked website is at the user&apos;s own
             risk.
           </p>
           <p>
